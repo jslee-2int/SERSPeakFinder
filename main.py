@@ -374,71 +374,88 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             QtWidgets.QMessageBox.warning(self, "Warning", "Config file not found. Proceeding without it.")
 
-    def save_config(self):
-        # ConfigParser 설정
-        config = ConfigParser()
-        config['LineEdits'] = {
-            'lineEdit': self.lineEdit.text(),
-            'lineEdit_2': self.lineEdit_2.text(),
-            'lineEdit_3': self.lineEdit_3.text(),
-            'lineEdit_4': self.lineEdit_4.text(),
-            'lineEdit_5': self.lineEdit_5.text(),
-            'lineEdit_6': self.lineEdit_6.text(),
-            'lineEdit_7': self.lineEdit_7.text(),
-            'lineEdit_8': self.lineEdit_8.text(),
-            'lineEdit_9': self.lineEdit_9.text(),
-            'lineEdit_10': self.lineEdit_10.text(),
-            'lineEdit_11': self.lineEdit_11.text(),
-            'lineEdit_12': self.lineEdit_12.text(),
-            'lineEdit_13': self.lineEdit_13.text(),
-            'lineEdit_14': self.lineEdit_14.text(),
-            'lineEdit_15': self.lineEdit_15.text(),
-            'lineEdit_16': self.lineEdit_16.text(),
-            'lineEdit_17': self.lineEdit_17.text(),
-            'lineEdit_19': self.lineEdit_19.text(),
-            'lineEdit_20': self.lineEdit_20.text(),
-            'lineEdit_21': self.lineEdit_21.text(),
-            'lineEdit_22': self.lineEdit_22.text(),
-            'lineEdit_23': self.lineEdit_23.text(),
-            'lineEdit_24': self.lineEdit_24.text(),
-            'lineEdit_25': self.lineEdit_25.text(),
-        }
+    # config.ini section/key -> UI lineEdit widget
+    CONFIG_FIELDS = (
+        ('split', 'raw_file', 'lineEdit_2'),
+        ('split', 'output_dir', 'lineEdit'),
+        ('classify', 'data_dir', 'lineEdit_3'),
+        ('classify', 'center_wl', 'lineEdit_4'),
+        ('classify', 'wl_range', 'lineEdit_5'),
+        ('train', 'data_dir', 'lineEdit_6'),
+        ('train', 'label_file', 'lineEdit_8'),
+        ('train', 'test_size', 'lineEdit_11'),
+        ('train', 'epochs', 'lineEdit_12'),
+        ('train', 'random_state', 'lineEdit_13'),
+        ('train', 'batch_size', 'lineEdit_14'),
+        ('train', 'validation_split', 'lineEdit_15'),
+        ('train', 'model_name', 'lineEdit_7'),
+        ('detect', 'model_path', 'lineEdit_9'),
+        ('detect', 'data_dir', 'lineEdit_10'),
+        ('compare', 'model_result', 'lineEdit_16'),
+        ('compare', 'manual_result', 'lineEdit_17'),
+        ('compare', 'plot_dir', 'lineEdit_19'),
+        ('integration', 'report_file', 'lineEdit_20'),
+        ('integration', 'data_dir', 'lineEdit_21'),
+        ('integration', 'fft_cutoff', 'lineEdit_18'),
+        ('integration', 'sg_window', 'lineEdit_22'),
+        ('integration', 'sg_polyorder', 'lineEdit_23'),
+        ('integration', 'center_wl', 'lineEdit_24'),
+        ('integration', 'wl_range', 'lineEdit_25'),
+    )
 
-        # Config 파일 저장
+    def save_config(self):
+        config = ConfigParser()
+        for section, key, widget_name in self.CONFIG_FIELDS:
+            if not config.has_section(section):
+                config.add_section(section)
+            config.set(section, key, getattr(self, widget_name).text())
+
         with open(self.config_file, 'w') as configfile:
             config.write(configfile)
-        # print("Config saved successfully.")
 
     def load_config(self):
-        # Config 파일 로드
         config = ConfigParser()
         config.read(self.config_file)
 
+        # New sectioned format
+        if any(config.has_section(s) for s, _, _ in self.CONFIG_FIELDS):
+            for section, key, widget_name in self.CONFIG_FIELDS:
+                getattr(self, widget_name).setText(
+                    config.get(section, key, fallback=''))
+            return
+
+        # Backward compatible: legacy [LineEdits] / lineedit_* keys
         if 'LineEdits' in config:
-            self.lineEdit.setText(config.get('LineEdits', 'lineEdit', fallback=''))
-            self.lineEdit_2.setText(config.get('LineEdits', 'lineEdit_2', fallback=''))
-            self.lineEdit_3.setText(config.get('LineEdits', 'lineEdit_3', fallback=''))
-            self.lineEdit_4.setText(config.get('LineEdits', 'lineEdit_4', fallback=''))
-            self.lineEdit_5.setText(config.get('LineEdits', 'lineEdit_5', fallback=''))
-            self.lineEdit_6.setText(config.get('LineEdits', 'lineEdit_6', fallback=''))
-            self.lineEdit_7.setText(config.get('LineEdits', 'lineEdit_7', fallback=''))
-            self.lineEdit_8.setText(config.get('LineEdits', 'lineEdit_8', fallback=''))
-            self.lineEdit_9.setText(config.get('LineEdits', 'lineEdit_9', fallback=''))
-            self.lineEdit_10.setText(config.get('LineEdits', 'lineEdit_10', fallback=''))
-            self.lineEdit_11.setText(config.get('LineEdits', 'lineEdit_11', fallback=''))
-            self.lineEdit_12.setText(config.get('LineEdits', 'lineEdit_12', fallback=''))
-            self.lineEdit_13.setText(config.get('LineEdits', 'lineEdit_13', fallback=''))
-            self.lineEdit_14.setText(config.get('LineEdits', 'lineEdit_14', fallback=''))
-            self.lineEdit_15.setText(config.get('LineEdits', 'lineEdit_15', fallback=''))
-            self.lineEdit_16.setText(config.get('LineEdits', 'lineEdit_16', fallback=''))
-            self.lineEdit_17.setText(config.get('LineEdits', 'lineEdit_17', fallback=''))
-            self.lineEdit_19.setText(config.get('LineEdits', 'lineEdit_19', fallback=''))
-            self.lineEdit_20.setText(config.get('LineEdits', 'lineEdit_20', fallback=''))
-            self.lineEdit_21.setText(config.get('LineEdits', 'lineEdit_21', fallback=''))
-            self.lineEdit_22.setText(config.get('LineEdits', 'lineEdit_22', fallback=''))
-            self.lineEdit_23.setText(config.get('LineEdits', 'lineEdit_23', fallback=''))
-            self.lineEdit_24.setText(config.get('LineEdits', 'lineEdit_24', fallback=''))
-            self.lineEdit_25.setText(config.get('LineEdits', 'lineEdit_25', fallback=''))
+            legacy = {
+                'lineEdit': 'lineEdit',
+                'lineEdit_2': 'lineEdit_2',
+                'lineEdit_3': 'lineEdit_3',
+                'lineEdit_4': 'lineEdit_4',
+                'lineEdit_5': 'lineEdit_5',
+                'lineEdit_6': 'lineEdit_6',
+                'lineEdit_7': 'lineEdit_7',
+                'lineEdit_8': 'lineEdit_8',
+                'lineEdit_9': 'lineEdit_9',
+                'lineEdit_10': 'lineEdit_10',
+                'lineEdit_11': 'lineEdit_11',
+                'lineEdit_12': 'lineEdit_12',
+                'lineEdit_13': 'lineEdit_13',
+                'lineEdit_14': 'lineEdit_14',
+                'lineEdit_15': 'lineEdit_15',
+                'lineEdit_16': 'lineEdit_16',
+                'lineEdit_17': 'lineEdit_17',
+                'lineEdit_18': 'lineEdit_18',
+                'lineEdit_19': 'lineEdit_19',
+                'lineEdit_20': 'lineEdit_20',
+                'lineEdit_21': 'lineEdit_21',
+                'lineEdit_22': 'lineEdit_22',
+                'lineEdit_23': 'lineEdit_23',
+                'lineEdit_24': 'lineEdit_24',
+                'lineEdit_25': 'lineEdit_25',
+            }
+            for ini_key, widget_name in legacy.items():
+                getattr(self, widget_name).setText(
+                    config.get('LineEdits', ini_key, fallback=''))
 
     def on_table_click(self):
         table_widget = None

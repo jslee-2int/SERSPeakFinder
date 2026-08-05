@@ -69,4 +69,3 @@ python main.py
 ## 참고
 
 - 학습/데이터 경로는 환경에 맞게 `config.ini`를 수정하세요.
-- UI 탭 이름은 과거 명칭(`CNN Training` 등)을 유지하고 있으며, 실제 모델은 MLP입니다.

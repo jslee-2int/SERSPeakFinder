@@ -69,4 +69,3 @@ Paths and hyperparameters are stored in `config.ini` and restored on the next la
 ## Notes
 
 - Update `config.ini` paths for your local or NAS data locations.
-- UI tab names keep legacy labels (e.g. `CNN Training`); the actual model is an MLP.
