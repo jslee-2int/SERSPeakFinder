@@ -1,4 +1,6 @@
-# Raman Spectrum Analysis Program User Manual
+# SERSPeakFinder
+
+SERS Raman Spectrum Peak Detection — User Manual
 
 ## Table of Contents
 1. [Program Overview](#program-overview)
