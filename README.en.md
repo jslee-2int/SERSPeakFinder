@@ -1,39 +1,122 @@
 # SERSPeakFinder
 
-A PyQt6 GUI for **detecting peak presence** in SERS (Raman) spectra.  
-It covers the full workflow: split mapped data into per-coordinate CSVs, manual labeling, model training, batch detection, result comparison, and peak-region integration.
+A GUI tool to **quantify nanoplastic components from Raman spectra**.  
+It covers the full pipeline from raw measurement data through peak classification, deep-learning prediction, worker comparison, and integration-based quantification.
 
 [한국어](README.md) | [English](README.en.md)
 
-## Workflow
+## Goal
 
-| Tab | Function |
+From Raman Spectrum raw data acquired by measurement, detect peak presence and quantify targets based on the classified results.
+
+```
+Measurement → Raw data
+     → Data Separation
+     → Data Classification (Peak O / X)
+     → 1D-CNN Training
+     → Prediction (with model)
+     → Comparison with AI and Worker
+     → Interpolation and integration → Quantification
+```
+
+## Pipeline
+
+### 1. Spectrum Data
+
+Raw mapping file (data frame) layout:
+
+| Field | Content |
 |---|---|
-| **Splite Plot Data** | Split raw txt/csv into per-coordinate `(x_y).csv` spectra |
-| **Plot Classifier** | Manual labeling: peak (1) / no peak (0) (`A` / `D`) |
-| **CNN Training** | Train binary classifier with live loss/accuracy plots |
-| **Run (Peak Detection)** | Batch inference with a trained `.pth` model |
-| **Compare with Prev. Plot** | Compare model vs manual labels and export a report |
-| **Interpolation** | Savitzky–Golay filter + linear baseline interpolation for peak-area integration |
+| Header col 1 | X |
+| Header col 2 | Y |
+| Header col 3+ | Wavelength |
+| Data col 1 | x axis |
+| Data col 2 | y axis (Mapping) |
+| Data col 3+ | Intensity |
 
-## Model
+![Raw dataframe](screenshot/01_spectrum_raw_dataframe.png)
 
-Despite the historical “CNN” wording in the UI, the network is a **fully connected MLP**, not a CNN.
+### 2. Data Separation (`Splite Plot Data`)
 
-- Input: spectrum CSV → `StandardScaler` → flattened 1D vector
-- Architecture: Linear `input → 128 → 64 → 32 → 1` with ReLU / Dropout / Sigmoid
-- Loss: BCELoss
-- Implementation: `BinaryClassifier` in `touch_training.py`
+Split raw data into per-coordinate spectrum files (`*_ (x_y).csv`).
 
-Example pretrained weights: `small_ng_samp_m*.pth` (default config uses `m6`)
+![Separated spectrum files](screenshot/02_data_separation_files.png)
+
+### 3. Data Classification (`Plot Classifier`)
+
+Manually label peak presence while viewing spectra. (`O`/`A` = peak, `X`/`D` = no peak)
+
+![Plot Classifier](screenshot/03_plot_classifier.png)
+
+### 4. 1D-CNN Training (`CNN Training`)
+
+Train a PyTorch binary classifier (CUDA when available; typically ~30 minutes depending on settings).
+
+**Model architecture (example input size = 1336)**
+
+```
+1336 → 128 → 64 → 32 → 1
+```
+
+- Linear + ReLU + Dropout + Sigmoid
+- Output in `[0, 1]` for binary peak classification
+- Monitor Train/Test Loss & Accuracy during training
+
+![Model summary](screenshot/04_model_summary.png)
+
+![Model concept](screenshot/05_model_concept.jpeg)
+
+![Training GUI](screenshot/06_cnn_training_gui.png)
+
+### 5. Prediction (`Run (Peak Detection)`)
+
+Predict peak presence with a trained `.pth` model.  
+Shows best accuracy and total / positive / negative counts.
+
+![Prediction](screenshot/07_prediction.png)
+
+### 6. Comparison with AI and Worker (`Compare with Prev. Plot`)
+
+Compare worker labels with model predictions and export a report.
+
+![Compare AI and Worker](screenshot/08_compare_ai_worker.png)
+
+### 7. Interpolation and integration (`Interpolation`)
+
+Interpolate and integrate the peak region for quantification.
+
+| Item | Settings |
+|---|---|
+| Fourier Transform | Freq. Cutoff |
+| Savitzky–Golay Filter | window_length, polyorder |
+| Linear Interpolation | center wavelength, span (±) |
+| Output | Integration value → Quantification |
+
+![Interpolation methods](screenshot/09_interpolation_methods.png)
+
+![Interpolation demo](screenshot/10_interpolation_demo.gif)
+
+![Interpolation GUI](screenshot/11_interpolation_gui.png)
+
+## Model Performance (example)
+
+Matching rate vs worker labels on `small ng samp 4~10` (400 each, 2800 total):
+
+| Model | Matching rate (Sum) |
+|---|---|
+| M4 | 96.07% |
+| M5 | **97.00%** |
+
+- M0: initial model
+- M5: updated model (matching rate ≈ 97%)
+
+Pretrained weights (`*.pth`) are **not included in this repository**. Keep them on local disk or NAS.
 
 ## Requirements
 
 - Windows 10+
 - Python 3.8+
-- Packages: `PyQt6`, `numpy`, `pandas`, `torch`, `scipy`, `matplotlib`, `scikit-learn`, `natsort`, `torchsummary`, `qbstyles`
-
-Uses CUDA when available; otherwise falls back to CPU.
+- `PyQt6`, `numpy`, `pandas`, `torch`, `scipy`, `matplotlib`, `scikit-learn`, `natsort`, `torchsummary`, `qbstyles`
 
 ## Install & Run
 
@@ -44,28 +127,36 @@ pip install PyQt6 numpy pandas torch scipy matplotlib scikit-learn natsort torch
 python main.py
 ```
 
-Paths and hyperparameters are stored in `config.ini` and restored on the next launch.
+Paths and hyperparameters are stored in `config.ini` (`split` / `classify` / `train` / `detect` / `compare` / `integration`).
 
 ## Key Files
 
 | File | Description |
 |---|---|
-| `main.py` | GUI entry point, training/inference threads, tab logic |
+| `main.py` | GUI entry point and tab logic |
 | `ui_main.py` / `ui_main.ui` | Qt Designer UI |
-| `touch_training.py` | Dataset, model, train/eval helpers |
-| `matplotlibwidget.py` | Matplotlib canvas widget |
-| `matplotlib_toolbar.py` | Plot toolbar |
-| `config.ini` | Recent paths and parameters |
-| `*.pth` | Trained model weights |
-| `main.spec` | PyInstaller packaging config |
+| `touch_training.py` | Dataset, model, train/eval |
+| `matplotlibwidget.py` | Spectrum plot widget |
+| `config.ini` | Paths and parameters |
+| `screenshot/` | Screenshots extracted from `raman_spectrum.pptx` |
+| `raman_spectrum.pptx` | Workflow / model-update notes |
 
-## Data Formats
+## Screenshot Index
 
-- **Raw**: tab-separated txt/csv (coordinate columns + intensity per wavenumber)
-- **Spectrum CSV**: one file per coordinate after splitting
-- **Label CSV**: `filename, peak_flag(0/1)`
-- **Detection CSV**: filename, prediction, confidence probability
+| File | Content |
+|---|---|
+| `01_spectrum_raw_dataframe.png` | Raw mapping dataframe |
+| `02_data_separation_files.png` | Per-coordinate CSV files |
+| `03_plot_classifier.png` | Manual peak labeling UI |
+| `04_model_summary.png` | Model layer summary |
+| `05_model_concept.jpeg` | Model concept diagram |
+| `06_cnn_training_gui.png` | Training UI (loss/accuracy) |
+| `07_prediction.png` | Peak detection UI |
+| `08_compare_ai_worker.png` | AI vs worker comparison UI |
+| `09_interpolation_methods.png` | SG filter + linear interpolation |
+| `10_interpolation_demo.gif` | Interpolation demo animation |
+| `11_interpolation_gui.png` | Interpolation tab UI |
 
-## Notes
+## Reference
 
-- Update `config.ini` paths for your local or NAS data locations.
+- `raman_spectrum.pptx` — Raman spectrum / Model update & Interpolation (2025.02.03, Lee Jeong-su)
