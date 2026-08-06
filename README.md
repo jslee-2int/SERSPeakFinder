@@ -9,14 +9,18 @@
 
 Measurement로 얻은 Raman Spectrum raw data에서 피크 유무를 판별하고, 분류 결과를 바탕으로 정량(적분)합니다.
 
-```
-Measurement → Raw data
-     → Data Separation
-     → Data Classification (Peak O / X)
-     → 1D-CNN Training
-     → Prediction (with model)
-     → Comparison with AI and Worker
-     → Interpolation and integration → Quantification
+```mermaid
+flowchart TD
+    A[Spectrum Data<br/>Measurement → Raw data]
+    B[Data Separation<br/>Raw data → Data Separation]
+    C[Data Classification<br/>Peak "o" or "x"]
+    D[1D-CNN Training<br/>param. Layer, Neuron, Epoch, Validation split…]
+    E[Prediction with model<br/>Train / Test Loss & Accuracy]
+    F[Comparison with AI and Worker<br/>Compare results, use corrected]
+    G[Interpolation and integration<br/>Quantify based on classified results]
+
+    A --> B --> C --> D --> E --> F --> G
+    F -.->|feedback| B
 ```
 
 ## 파이프라인

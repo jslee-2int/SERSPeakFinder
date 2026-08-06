@@ -9,14 +9,18 @@ It covers the full pipeline from raw measurement data through peak classificatio
 
 From Raman Spectrum raw data acquired by measurement, detect peak presence and quantify targets based on the classified results.
 
-```
-Measurement → Raw data
-     → Data Separation
-     → Data Classification (Peak O / X)
-     → 1D-CNN Training
-     → Prediction (with model)
-     → Comparison with AI and Worker
-     → Interpolation and integration → Quantification
+```mermaid
+flowchart TD
+    A[Spectrum Data<br/>Measurement → Raw data]
+    B[Data Separation<br/>Raw data → Data Separation]
+    C[Data Classification<br/>Peak "o" or "x"]
+    D[1D-CNN Training<br/>param. Layer, Neuron, Epoch, Validation split…]
+    E[Prediction with model<br/>Train / Test Loss & Accuracy]
+    F[Comparison with AI and Worker<br/>Compare results, use corrected]
+    G[Interpolation and integration<br/>Quantify based on classified results]
+
+    A --> B --> C --> D --> E --> F --> G
+    F -.->|feedback| B
 ```
 
 ## Pipeline
