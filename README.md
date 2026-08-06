@@ -64,8 +64,6 @@ PyTorch 기반 이진 분류 모델을 학습합니다. (GPU/CUDA 사용 가능,
 
 ![Model summary](screenshot/04_model_summary.png)
 
-![Model concept](screenshot/05_model_concept.jpeg)
-
 ![Training GUI](screenshot/06_cnn_training_gui.png)
 
 ### 5. Prediction (`Run (Peak Detection)`)
@@ -93,8 +91,6 @@ Best accuracy, Total / Positive / Negative count를 확인합니다.
 | 결과 | Integration value → Quantification |
 
 ![Interpolation methods](screenshot/09_interpolation_methods.png)
-
-![Interpolation demo](screenshot/10_interpolation_demo.gif)
 
 ![Interpolation GUI](screenshot/11_interpolation_gui.png)
 
@@ -149,12 +145,10 @@ python main.py
 | `02_data_separation_files.png` | 좌표별 분리 CSV |
 | `03_plot_classifier.png` | 수동 피크 분류 UI |
 | `04_model_summary.png` | 모델 레이어 summary |
-| `05_model_concept.jpeg` | 모델 개념도 |
 | `06_cnn_training_gui.png` | 학습 UI (loss/accuracy) |
 | `07_prediction.png` | 예측(Peak Detection) UI |
 | `08_compare_ai_worker.png` | AI vs Worker 비교 UI |
 | `09_interpolation_methods.png` | SG 필터 + 선형 보간 과정 |
-| `10_interpolation_demo.gif` | 보간 데모 애니메이션 |
 | `11_interpolation_gui.png` | Interpolation 탭 UI |
 
 ## 참고 자료

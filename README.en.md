@@ -64,8 +64,6 @@ Train a PyTorch binary classifier (CUDA when available; typically ~30 minutes de
 
 ![Model summary](screenshot/04_model_summary.png)
 
-![Model concept](screenshot/05_model_concept.jpeg)
-
 ![Training GUI](screenshot/06_cnn_training_gui.png)
 
 ### 5. Prediction (`Run (Peak Detection)`)
@@ -93,8 +91,6 @@ Interpolate and integrate the peak region for quantification.
 | Output | Integration value → Quantification |
 
 ![Interpolation methods](screenshot/09_interpolation_methods.png)
-
-![Interpolation demo](screenshot/10_interpolation_demo.gif)
 
 ![Interpolation GUI](screenshot/11_interpolation_gui.png)
 
@@ -149,12 +145,10 @@ Paths and hyperparameters are stored in `config.ini` (`split` / `classify` / `tr
 | `02_data_separation_files.png` | Per-coordinate CSV files |
 | `03_plot_classifier.png` | Manual peak labeling UI |
 | `04_model_summary.png` | Model layer summary |
-| `05_model_concept.jpeg` | Model concept diagram |
 | `06_cnn_training_gui.png` | Training UI (loss/accuracy) |
 | `07_prediction.png` | Peak detection UI |
 | `08_compare_ai_worker.png` | AI vs worker comparison UI |
 | `09_interpolation_methods.png` | SG filter + linear interpolation |
-| `10_interpolation_demo.gif` | Interpolation demo animation |
 | `11_interpolation_gui.png` | Interpolation tab UI |
 
 ## Reference
