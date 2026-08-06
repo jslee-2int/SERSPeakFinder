@@ -11,13 +11,13 @@ From Raman Spectrum raw data acquired by measurement, detect peak presence and q
 
 ```mermaid
 flowchart TD
-    A[Spectrum Data<br/>Measurement → Raw data]
-    B[Data Separation<br/>Raw data → Data Separation]
-    C[Data Classification<br/>Peak "o" or "x"]
-    D[1D-CNN Training<br/>param. Layer, Neuron, Epoch, Validation split…]
-    E[Prediction with model<br/>Train / Test Loss & Accuracy]
-    F[Comparison with AI and Worker<br/>Compare results, use corrected]
-    G[Interpolation and integration<br/>Quantify based on classified results]
+    A["Spectrum Data<br/>Measurement to Raw data"]
+    B["Data Separation<br/>Raw data to Data Separation"]
+    C["Data Classification<br/>Peak o or x"]
+    D["1D-CNN Training<br/>Layer, Neuron, Epoch, Validation split"]
+    E["Prediction with model<br/>Train / Test Loss and Accuracy"]
+    F["Comparison with AI and Worker<br/>Compare results, use corrected"]
+    G["Interpolation and integration<br/>Quantify based on classified results"]
 
     A --> B --> C --> D --> E --> F --> G
     F -.->|feedback| B
